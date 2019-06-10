@@ -30,6 +30,7 @@ kind: Pod
 metadata:
   name: name
 spec:
+  schedulerName: clipper
   containers:
     - name: base
       image: airflow-worker:latest
@@ -65,6 +66,7 @@ spec:
         self.extract_tolerations(pod, req)
         self.extract_security_context(pod, req)
         self.extract_dnspolicy(pod, req)
+        self.extract_schedulername(pod,req)
         return req
 
 
@@ -79,6 +81,7 @@ kind: Pod
 metadata:
   name: name
 spec:
+  schedulerName: clipper
   volumes:
     - name: xcom
       emptyDir: {{}}
@@ -135,4 +138,5 @@ spec:
         self.extract_tolerations(pod, req)
         self.extract_security_context(pod, req)
         self.extract_dnspolicy(pod, req)
+        self.extract_schedulername(pod,req)
         return req
