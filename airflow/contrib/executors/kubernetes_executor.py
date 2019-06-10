@@ -45,7 +45,7 @@ class KubernetesExecutorConfig:
     def __init__(self, image=None, image_pull_policy=None, request_memory=None,
                  request_cpu=None, limit_memory=None, limit_cpu=None, limit_gpu=None,
                  gcp_service_account_key=None, node_selectors=None, affinity=None,
-                 annotations=None, volumes=None, volume_mounts=None, tolerations=None, labels=None):
+                 annotations=None, volumes=None, volume_mounts=None, tolerations=None, labels=None,custom_labels=None):
         self.image = image
         self.image_pull_policy = image_pull_policy
         self.request_memory = request_memory
@@ -61,17 +61,18 @@ class KubernetesExecutorConfig:
         self.volume_mounts = volume_mounts
         self.tolerations = tolerations
         self.labels = labels or {}
+        self.custom_labels = custom_labels
 
     def __repr__(self):
         return "{}(image={}, image_pull_policy={}, request_memory={}, request_cpu={}, " \
                "limit_memory={}, limit_cpu={}, limit_gpu={}, gcp_service_account_key={}, " \
                "node_selectors={}, affinity={}, annotations={}, volumes={}, " \
-               "volume_mounts={}, tolerations={}, labels={})" \
+               "volume_mounts={}, tolerations={}, labels={}, custom_labels={})" \
             .format(KubernetesExecutorConfig.__name__, self.image, self.image_pull_policy,
                     self.request_memory, self.request_cpu, self.limit_memory,
                     self.limit_cpu, self.limit_gpu, self.gcp_service_account_key, self.node_selectors,
                     self.affinity, self.annotations, self.volumes, self.volume_mounts,
-                    self.tolerations, self.labels)
+                    self.tolerations, self.labels,self.custom_labels)
 
     @staticmethod
     def from_dict(obj):
@@ -100,6 +101,7 @@ class KubernetesExecutorConfig:
             volume_mounts=namespaced.get('volume_mounts', []),
             tolerations=namespaced.get('tolerations', None),
             labels=namespaced.get('labels', {}),
+            custom_labels=namespaced.get('custom_labels',None),
         )
 
     def as_dict(self):
@@ -259,6 +261,15 @@ class KubeConfig:
         else:
             self.kube_tolerations = None
 
+        default_resource_json = conf.get(self.kubernetes_section, 'default_limits')
+        #TODO validate
+        if default_resource_json:
+            self.default_limits = json.loads(default_resource_json)
+        else:
+            self.default_limits = None
+
+        self.scheduler_name = conf.get(self.kubernetes_section, 'scheduler_name')
+
         kube_client_request_args = conf.get(self.kubernetes_section, 'kube_client_request_args')
         if kube_client_request_args:
             self.kube_client_request_args = json.loads(kube_client_request_args)
@@ -300,6 +311,10 @@ class KubeConfig:
                 'must be set for authentication through user credentials; '
                 'or `git_ssh_key_secret_name` must be set for authentication '
                 'through ssh key, but not both')
+        
+        # if self.default_limits:
+        #     if self.default_limits:
+        #         raise AirflowConfigException('')
 
 
 class KubernetesJobWatcher(multiprocessing.Process, LoggingMixin, object):

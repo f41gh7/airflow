@@ -164,6 +164,8 @@ class AirflowConfigParser(ConfigParser):
             'task_runner': ('BashTaskRunner', 'StandardTaskRunner', '2.0'),
         },
     }
+    #little hack for case sensetive variables
+    optionxform = str
 
     def __init__(self, default_config=None, *args, **kwargs):
         super(AirflowConfigParser, self).__init__(*args, **kwargs)

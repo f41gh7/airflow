@@ -18,11 +18,16 @@
 import os
 import six
 
+
 from airflow.configuration import conf
 from airflow.contrib.kubernetes.pod import Pod, Resources
 from airflow.contrib.kubernetes.secret import Secret
 from airflow.utils.log.logging_mixin import LoggingMixin
+from functools import reduce
 
+def deep_get(dictionary, keys, default=None):
+    result = reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
+    return result
 
 class WorkerConfiguration(LoggingMixin):
     """Contains Kubernetes Airflow Worker configuration logic"""
@@ -314,6 +319,8 @@ class WorkerConfiguration(LoggingMixin):
                  try_number, airflow_command, kube_executor_config):
         volumes_dict, volume_mounts_dict = self._get_volumes_and_mounts()
         worker_init_container_spec = self._get_init_containers()
+        #TODO add resourses merge
+        #
         resources = Resources(
             request_memory=kube_executor_config.request_memory,
             request_cpu=kube_executor_config.request_cpu,
@@ -321,6 +328,16 @@ class WorkerConfiguration(LoggingMixin):
             limit_cpu=kube_executor_config.limit_cpu,
             limit_gpu=kube_executor_config.limit_gpu
         )
+        #hack for creating default resources
+        #TODO make it safe
+        if  resources.is_empty_resource_request() and self.kube_config.default_limits:
+            resources = Resources(
+            request_memory=deep_get(self.kube_config.default_limits,'request.memory') ,
+            request_cpu=deep_get(self.kube_config.default_limits,'request.cpu'),
+            limit_memory=deep_get(self.kube_config.default_limits,'limit.memory'),
+            limit_cpu=deep_get(self.kube_config.default_limits,'limit.cpu')
+            )
+
         gcp_sa_key = kube_executor_config.gcp_service_account_key
         annotations = dict(kube_executor_config.annotations) or self.kube_config.kube_annotations
         if gcp_sa_key:
@@ -360,5 +377,6 @@ class WorkerConfiguration(LoggingMixin):
             affinity=affinity,
             tolerations=tolerations,
             security_context=self._get_security_context(),
-            configmaps=self._get_configmaps()
+            configmaps=self._get_configmaps(),
+            scheduler_name = self.kube_config.scheduler_name
         )

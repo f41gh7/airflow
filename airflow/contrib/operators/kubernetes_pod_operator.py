@@ -141,6 +141,7 @@ class KubernetesPodOperator(BaseOperator):
             pod.configmaps = self.configmaps
             pod.security_context = self.security_context
             pod.pod_runtime_info_envs = self.pod_runtime_info_envs
+            pod.scheduler_name = self.scheduler_name
             pod.dnspolicy = self.dnspolicy
 
             launcher = pod_launcher.PodLauncher(kube_client=client,
@@ -203,6 +204,7 @@ class KubernetesPodOperator(BaseOperator):
                  security_context=None,
                  pod_runtime_info_envs=None,
                  dnspolicy=None,
+                 cheduler_name=None,
                  *args,
                  **kwargs):
         super(KubernetesPodOperator, self).__init__(*args, **kwargs)
@@ -237,3 +239,4 @@ class KubernetesPodOperator(BaseOperator):
         self.security_context = security_context or {}
         self.pod_runtime_info_envs = pod_runtime_info_envs or []
         self.dnspolicy = dnspolicy
+        self.scheduler_name = scheduler_name

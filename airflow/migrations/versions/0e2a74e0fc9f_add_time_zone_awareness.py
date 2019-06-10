@@ -45,11 +45,11 @@ def upgrade():
                 "Global variable explicit_defaults_for_timestamp needs to be on (1) for mysql"
             )
 
-        op.alter_column(
-            table_name="chart",
-            column_name="last_modified",
-            type_=mysql.TIMESTAMP(fsp=6),
-        )
+#        op.alter_column(
+#            table_name="chart",
+#            column_name="last_modified",
+#            type_=mysql.TIMESTAMP(fsp=6),
+#        )
 
         op.alter_column(
             table_name="dag",
@@ -170,11 +170,11 @@ def upgrade():
         if conn.dialect.name == "postgresql":
             conn.execute("set timezone=UTC")
 
-        op.alter_column(
-            table_name="chart",
-            column_name="last_modified",
-            type_=sa.TIMESTAMP(timezone=True),
-        )
+#        op.alter_column(
+#            table_name="chart",
+#            column_name="last_modified",
+#            type_=sa.TIMESTAMP(timezone=True),
+#        )
 
         op.alter_column(
             table_name="dag",
@@ -309,9 +309,9 @@ def downgrade():
     conn = op.get_bind()
     if conn.dialect.name == "mysql":
         conn.execute("SET time_zone = '+00:00'")
-        op.alter_column(
-            table_name="chart", column_name="last_modified", type_=mysql.DATETIME(fsp=6)
-        )
+#        op.alter_column(
+#            table_name="chart", column_name="last_modified", type_=mysql.DATETIME(fsp=6)
+#        )
 
         op.alter_column(
             table_name="dag",
@@ -429,9 +429,9 @@ def downgrade():
         if conn.dialect.name == "postgresql":
             conn.execute("set timezone=UTC")
 
-        op.alter_column(
-            table_name="chart", column_name="last_modified", type_=sa.DateTime()
-        )
+#        op.alter_column(
+#            table_name="chart", column_name="last_modified", type_=sa.DateTime()
+#        )
 
         op.alter_column(
             table_name="dag", column_name="last_scheduler_run", type_=sa.DateTime()
