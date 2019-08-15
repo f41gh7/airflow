@@ -1,4 +1,4 @@
-# Licensed to the Apache Software Foundation (ASF) under one
+t# Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
 # regarding copyright ownership.  The ASF licenses this file
@@ -120,7 +120,6 @@ class Pod:
             pod_runtime_info_envs=None,
             dnspolicy=None,
             scheduler_name=None
-
     ):
         self.image = image
         self.envs = envs or {}
