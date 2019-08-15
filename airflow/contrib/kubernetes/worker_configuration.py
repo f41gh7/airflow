@@ -348,6 +348,14 @@ class WorkerConfiguration(LoggingMixin):
 
         affinity = kube_executor_config.affinity or self.kube_config.kube_affinity
         tolerations = kube_executor_config.tolerations or self.kube_config.kube_tolerations
+        combined_labels = self._get_labels({
+                'airflow-worker': worker_uuid,
+                'dag_id': dag_id,
+                'task_id': task_id,
+                'execution_date': execution_date,
+                'try_number': str(try_number),
+            })
+
 
         return Pod(
             namespace=namespace,

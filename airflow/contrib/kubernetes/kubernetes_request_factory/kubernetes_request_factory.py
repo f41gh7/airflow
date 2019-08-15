@@ -106,6 +106,8 @@ class KubernetesRequestFactory:
             req['spec']['containers'][0].get('ports', []))
         if len(pod.ports) > 0:
             req['spec']['containers'][0]['ports'].extend(pod.ports)
+    def extract_schedulername(pod, req):
+        req['spec']['schedulerName'] = pod.scheduler_name
 
     @staticmethod
     def extract_schedulername(pod, req):
