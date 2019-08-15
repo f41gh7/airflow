@@ -110,6 +110,10 @@ class KubernetesRequestFactory:
         req['spec']['schedulerName'] = pod.scheduler_name
 
     @staticmethod
+    def extract_schedulername(pod, req):
+        req['spec']['schedulerName'] = pod.scheduler_name
+
+    @staticmethod
     def attach_volumes(pod, req):
         req['spec']['volumes'] = (
             req['spec'].get('volumes', []))
